@@ -8,11 +8,16 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.example.customview.ButtomCustomLogin
 import com.example.customview.EditTextCustomPassword
 import com.example.network.ApiConfig
 import com.example.network.UserRegister
 import com.example.ui.databinding.ActivitySignupBinding
+import com.example.viewmodel.LoginViewModel
+import com.example.viewmodel.SignupViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -22,10 +27,16 @@ class SignupActivity : AppCompatActivity() {
     private lateinit var signupButton: ButtomCustomLogin
     private lateinit var binding: ActivitySignupBinding
 
+    private lateinit var viewModel: SignupViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignupBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(
+           SignupViewModel::class.java
+        )
 
         myEditTextPassword = findViewById(R.id.edit_text_password_signup)
         signupButton = findViewById(R.id.button_signup)
@@ -54,25 +65,10 @@ class SignupActivity : AppCompatActivity() {
             val password = binding.editTextPasswordSignup.text.toString().trim()
             val regUser = UserRegister(name, email, password)
 
-            val client = ApiConfig.getApiService().registerUser(regUser)
-            client.enqueue(object : Callback<UserRegister> {
-                override fun onResponse(call: Call<UserRegister>, response: Response<UserRegister>) {
-                    if (response.isSuccessful){
-                        makeToast("User Created!, Please login")
-//                        Intent(this@SignupActivity, LoginActivity::class.java).also {
-//                            startActivity(it)
-//                        }
-//                        Log.e("TAG", name)
-                    } else {
-//                        makeToast(false, response.message())
-                        Log.e("TAG", "onFailure: ${response.message()}")
-                    }
-                }
-
-                override fun onFailure(call: Call<UserRegister>, t: Throwable) {
-                    Log.e("TAG", "onFailure: ${t.message}")
-                }
-            })
+            viewModel.setUserSignup(regUser)
+            viewModel.isSuccessful.observe(this) {
+                signupProcess(it)
+            }
         }
 
         binding.tvSignup.setOnClickListener {
@@ -80,6 +76,18 @@ class SignupActivity : AppCompatActivity() {
                 startActivity(it)
             }
         }
+    }
+
+    private fun signupProcess(value: Boolean) {
+        viewModel.response.observe(this) {
+
+            if (value) {
+                makeToast("User Created!, Please login")
+            } else {
+                makeToast(it)
+            }
+        }
+
     }
 
     private fun makeToast(msg: String){

@@ -5,20 +5,15 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import com.example.customview.ButtomCustomLogin
 import com.example.customview.EditTextCustomPassword
-import com.example.network.ApiConfig
 import com.example.network.UserLogin
-import com.example.network.UserRegister
 import com.example.ui.databinding.ActivityLoginBinding
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import kotlin.math.sign
+import com.example.viewmodel.LoginViewModel
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var myEditTextPassword: EditTextCustomPassword
@@ -27,10 +22,16 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var signup: TextView
     private lateinit var binding: ActivityLoginBinding
 
+    private lateinit var viewModel: LoginViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(
+            LoginViewModel::class.java
+        )
 
         myEditTextPassword = findViewById(R.id.edit_text_password)
         errorMessage = findViewById(R.id.tv_password_error_message)
@@ -60,28 +61,22 @@ class LoginActivity : AppCompatActivity() {
             val password = binding.editTextPassword.text.toString().trim()
             val loginUser = UserLogin(email, password)
 
-            val client = ApiConfig.getApiService().loginUser(loginUser)
-            client.enqueue(object : Callback<UserLogin> {
-                override fun onResponse(call: Call<UserLogin>, response: Response<UserLogin>) {
-                    if(response.isSuccessful){
-                        makeToast(response.body().toString())
-                        Intent(this@LoginActivity, HomeActivity::class.java).also {
-                            startActivity(it)
-                        }
-                    }else{
-                        makeToast(response.message())
-                    }
-                }
-
-                override fun onFailure(call: Call<UserLogin>, t: Throwable) {
-
-                }
-
-            })
+            viewModel.setUserLogin(loginUser)
+            viewModel.isSuccessful.observe(this) {
+                loginProcess(it)
+            }
         }
 
         signup.setOnClickListener {
             Intent(this, SignupActivity::class.java).also {
+                startActivity(it)
+            }
+        }
+    }
+
+    private fun loginProcess(value: Boolean){
+        if (value) {
+            Intent(this, MainActivity::class.java).also {
                 startActivity(it)
             }
         }
