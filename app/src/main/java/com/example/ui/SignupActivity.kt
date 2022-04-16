@@ -66,9 +66,10 @@ class SignupActivity : AppCompatActivity() {
             val regUser = UserRegister(name, email, password)
 
             viewModel.setUserSignup(regUser)
-            viewModel.isSuccessful.observe(this) {
-                signupProcess(it)
-            }
+        }
+
+        viewModel.isSuccessful.observe(this) {
+            signupProcess(it)
         }
 
         binding.tvSignup.setOnClickListener {
@@ -79,15 +80,9 @@ class SignupActivity : AppCompatActivity() {
     }
 
     private fun signupProcess(value: Boolean) {
-        viewModel.response.observe(this) {
-
-            if (value) {
-                makeToast("User Created!, Please login")
-            } else {
-                makeToast(it)
-            }
+        if (value) {
+            makeToast("User Created!, Please login")
         }
-
     }
 
     private fun makeToast(msg: String){

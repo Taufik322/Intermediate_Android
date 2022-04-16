@@ -26,7 +26,7 @@ class SignupViewModel : ViewModel() {
                     _response.postValue(response.message())
                 } else {
                     _isSuccessful.value = false
-                    _response.postValue(response.message().toString())
+                    _response.postValue(response.message())
                 }
             }
 

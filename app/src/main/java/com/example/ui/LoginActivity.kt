@@ -1,5 +1,6 @@
 package com.example.ui
 
+import android.content.ContentValues.TAG
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,9 +12,12 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.example.customview.ButtomCustomLogin
 import com.example.customview.EditTextCustomPassword
+import com.example.helper.Session
+import com.example.network.DataLoginResult
 import com.example.network.UserLogin
 import com.example.ui.databinding.ActivityLoginBinding
 import com.example.viewmodel.LoginViewModel
+import kotlin.math.log
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var myEditTextPassword: EditTextCustomPassword
@@ -23,6 +27,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
 
     private lateinit var viewModel: LoginViewModel
+    private lateinit var session: Session
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +43,9 @@ class LoginActivity : AppCompatActivity() {
         loginButton = findViewById(R.id.button_login)
         signup = findViewById(R.id.tv_signup)
 
-        myEditTextPassword.addTextChangedListener(object : TextWatcher{
+        session = Session(this)
+
+        myEditTextPassword.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
 
@@ -62,10 +69,33 @@ class LoginActivity : AppCompatActivity() {
             val loginUser = UserLogin(email, password)
 
             viewModel.setUserLogin(loginUser)
-            viewModel.isSuccessful.observe(this) {
-                loginProcess(it)
+            makeToast("Please Wait")
+
+        }
+
+//        viewModel._isSuccessful.value = false
+//
+//        viewModel.isSuccessful.observe(this) {
+//            if (it) {
+//                loginProcess(it)
+//                viewModel.response.observe(this) { dataLogin ->
+//                    makeToast(dataLogin.token)
+//                }
+//            }
+//        }
+
+        viewModel.isSuccessful.observe(this) {
+            if (it) {
+                loginProcess()
+                viewModel.response.observe(this) { dataLogin ->
+                    session.saveToken(dataLogin.token)
+                    session.saveLogin(true)
+                }
+            } else {
+                makeToast("salah")
             }
         }
+
 
         signup.setOnClickListener {
             Intent(this, SignupActivity::class.java).also {
@@ -74,15 +104,36 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun loginProcess(value: Boolean){
-        if (value) {
-            Intent(this, MainActivity::class.java).also {
-                startActivity(it)
-            }
+    private fun loginProcess() {
+        Intent(this, HomeActivity::class.java).also {
+            startActivity(it)
         }
+        finish()
+//        val intent = Intent(this, HomeActivity::class.java)
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//        startActivity(intent)
+//        session.setLogin(true)
     }
 
-    private fun makeToast(msg: String){
+    private fun makeToast(msg: String) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    }
+
+
+    override fun onStart() {
+        super.onStart()
+        if (session.getLogin()){
+//            val intent = Intent(this, HomeActivity::class.java)
+//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//            startActivity(intent)
+//            finish()
+
+            Intent(this, HomeActivity::class.java).also {
+                startActivity(it)
+            }
+            finish()
+        }
     }
 }
