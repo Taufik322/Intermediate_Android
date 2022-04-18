@@ -20,26 +20,32 @@ class LoginViewModel : ViewModel() {
     val _isSuccessful = MutableLiveData<Boolean>()
     val isSuccessful: LiveData<Boolean> = _isSuccessful
 
-    private val _isSuccessful2 = MutableLiveData<UserLoginResponse>()
-    val isSuccessful2: LiveData<UserLoginResponse> = _isSuccessful2
+    private val _isSuccessful2 = MutableLiveData<ResponseBody>()
+    val isSuccessful2: LiveData<ResponseBody> = _isSuccessful2
 
     private val _response = MutableLiveData<DataLoginResult>()
     val response: LiveData<DataLoginResult> = _response
 
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+
     fun setUserLogin(user: UserLogin){
 //        _isSuccessful.value = false
+        _isLoading.value = true
 
         val client = ApiConfig.getApiService().loginUser(user)
         client.enqueue(object : Callback<UserLoginResponse> {
             override fun onResponse(call: Call<UserLoginResponse>, response: Response<UserLoginResponse>) {
                 if (response.isSuccessful){
+                    _isLoading.value = false
                     _isSuccessful.postValue(true)
                     _response.postValue(response.body()?.loginResult)
-                    _isSuccessful2.postValue(response.body())
+//                    _isSuccessful2.postValue(response.errorBody())
 //                    _response.postValue(response.message())
                 } else {
-//                    _isSuccessful2.postValue(response.body())
+//                    _isSuccessful2.postValue(response.errorBody())
                     _isSuccessful.postValue(false)
+                    _isLoading.value = false
 //                    _response.postValue(response.message())
                 }
             }

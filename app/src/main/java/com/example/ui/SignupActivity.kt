@@ -38,6 +38,9 @@ class SignupActivity : AppCompatActivity() {
            SignupViewModel::class.java
         )
 
+        showLoading(false)
+        binding.buttonSignup.isEnabled = false
+
         myEditTextPassword = findViewById(R.id.edit_text_password_signup)
         signupButton = findViewById(R.id.button_signup)
 
@@ -69,12 +72,21 @@ class SignupActivity : AppCompatActivity() {
         }
 
         viewModel.isSuccessful.observe(this) {
-            signupProcess(it)
+            if(it){
+                signupProcess(it)
+            } else {
+                makeToast("Must be valid email!")
+            }
         }
 
-        binding.tvSignup.setOnClickListener {
+        viewModel.isLoading.observe(this) {
+            showLoading(it)
+        }
+
+        binding.tvLogin.setOnClickListener {
             Intent(this, LoginActivity::class.java).also {
                 startActivity(it)
+                finish()
             }
         }
     }
@@ -89,5 +101,32 @@ class SignupActivity : AppCompatActivity() {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
+    private fun showLoading(value: Boolean){
+        if (value){
+            binding.progressBar.visibility = View.VISIBLE
+            binding.buttonSignup.isEnabled = false
+            binding.tvLogin.isEnabled = false
+
+            binding.logoLogin.alpha = 0.5f
+            binding.tvNameSignup.alpha = 0.5f
+            binding.editTextNameSignup.alpha = 0.5f
+            binding.tvEmailSignup.alpha = 0.5f
+            binding.editTextEmailSignup.alpha = 0.5f
+            binding.tvPasswordSignup.alpha = 0.5f
+            binding.editTextPasswordSignup.alpha = 0.5f
+        } else {
+            binding.progressBar.visibility = View.GONE
+            binding.buttonSignup.isEnabled = true
+            binding.tvLogin.isEnabled = true
+
+            binding.logoLogin.alpha = 1f
+            binding.tvNameSignup.alpha = 1f
+            binding.editTextNameSignup.alpha = 1f
+            binding.tvEmailSignup.alpha = 1f
+            binding.editTextEmailSignup.alpha = 1f
+            binding.tvPasswordSignup.alpha = 1f
+            binding.editTextPasswordSignup.alpha = 1f
+        }
+    }
 
 }
