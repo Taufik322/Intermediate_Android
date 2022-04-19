@@ -84,6 +84,12 @@ class HomeActivity : AppCompatActivity() {
                 alertDialogLogout()
                 return true
             }
+
+            R.id.add_story -> {
+                Intent(this, AddStoryActivity::class.java).also {
+                    startActivity(it)
+                }
+            }
         }
         return true
     }

@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.IntermediateAndroid">
         <activity
+            android:name=".AddStoryActivity"
+            android:exported="false" />
+        <activity
             android:name=".StoryDetailActivity"
             android:exported="false" />
         <activity
