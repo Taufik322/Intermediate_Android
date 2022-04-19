@@ -1,26 +1,18 @@
 package com.example.ui
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.customview.ButtomCustomLogin
 import com.example.customview.EditTextCustomPassword
-import com.example.network.ApiConfig
 import com.example.network.UserRegister
 import com.example.ui.databinding.ActivitySignupBinding
-import com.example.viewmodel.LoginViewModel
 import com.example.viewmodel.SignupViewModel
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class SignupActivity : AppCompatActivity() {
     private lateinit var myEditTextPassword: EditTextCustomPassword

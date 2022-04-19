@@ -1,8 +1,6 @@
 package com.example.network
 
-import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import kotlinx.android.parcel.Parcelize
 
 data class UserLogin(
     @field:SerializedName("email")

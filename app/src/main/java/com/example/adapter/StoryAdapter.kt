@@ -1,18 +1,20 @@
 package com.example.adapter
 
+import android.app.Activity
+import android.app.ActivityOptions
+import android.content.Intent
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.app.ActivityOptionsCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.example.network.ListStory
+import com.example.ui.R
+import com.example.ui.StoryDetailActivity
 import com.example.ui.databinding.ItemStoriesBinding
-
-//import com.example.ui.databinding.ActivityHomeBinding
-//import com.example.ui.databinding.ItemStoriesBinding
 
 class StoryAdapter : RecyclerView.Adapter<StoryAdapter.StoryViewHolder>() {
     private val story = ArrayList<ListStory>()
@@ -34,6 +36,7 @@ class StoryAdapter : RecyclerView.Adapter<StoryAdapter.StoryViewHolder>() {
 
     class StoryViewHolder(private val binding: ItemStoriesBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
         fun bind(storyList: ListStory) {
             with(binding) {
                 tvName.text = storyList.name
@@ -42,6 +45,22 @@ class StoryAdapter : RecyclerView.Adapter<StoryAdapter.StoryViewHolder>() {
                     .load(storyList.photoUrl)
                     .transition(withCrossFade())
                     .into(imageStory)
+                itemView.setOnClickListener {
+                    val optionsCompat: ActivityOptionsCompat =
+                        ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            itemView.context as Activity,
+                            androidx.core.util.Pair(tvName, "name"),
+                            androidx.core.util.Pair(tvDescription, "desc"),
+                            androidx.core.util.Pair(imageStory, "image"),
+                        )
+
+                    Intent(it.context, StoryDetailActivity::class.java).also { intent ->
+                        intent.putExtra(StoryDetailActivity.EXTRA_STORY_NAME, storyList.name)
+                        intent.putExtra(StoryDetailActivity.EXTRA_STORY_IMAGE, storyList.photoUrl)
+                        intent.putExtra(StoryDetailActivity.EXTRA_STORY_DESC, storyList.description)
+                        itemView.context.startActivity(intent, optionsCompat.toBundle())
+                    }
+                }
             }
         }
     }

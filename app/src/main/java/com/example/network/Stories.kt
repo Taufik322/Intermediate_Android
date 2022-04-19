@@ -1,7 +1,6 @@
 package com.example.network
 
 import com.google.gson.annotations.SerializedName
-import retrofit2.http.Field
 
 data class Stories(
     @field:SerializedName("error")

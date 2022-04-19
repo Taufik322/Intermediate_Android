@@ -1,19 +1,18 @@
 package com.example.ui
 
 import android.app.AlertDialog
-import android.app.SearchManager
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.widget.SearchView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.adapter.StoryAdapter
 import com.example.helper.Session
 import com.example.network.ListStory
@@ -25,9 +24,9 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var session: Session
 
     private lateinit var adapter: StoryAdapter
-    private lateinit var storList: List<ListStory>
-
     private lateinit var viewModel: HomeViewModel
+
+    private lateinit var swipeRefresh: SwipeRefreshLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,23 +34,42 @@ class HomeActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         session = Session(this)
+        binding.progressBar.visibility = View.GONE
+        swipeRefresh = binding.refresh
 
         viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(
             HomeViewModel::class.java
         )
 
+        viewModel.isLoading.observe(this) {
+            showLoading(it)
+        }
 
         adapter = StoryAdapter()
 
         viewModel.getAllStories(session.getToken().toString())
-        viewModel.listStory2.observe(this) {
-            if (it != null){
-                adapter.setStoryList(it)
-                binding.rvStory.layoutManager = LinearLayoutManager(this)
-                binding.rvStory.setHasFixedSize(true)
-                binding.rvStory.adapter = adapter
+        viewModel.listStory.observe(this) {
+            if (it != null) {
+                setStoryData(it)
             }
         }
+
+        swipeRefresh.setOnRefreshListener {
+            viewModel.getAllStories(session.getToken().toString())
+            viewModel.listStory.observe(this) {
+                if (it != null) {
+                    setStoryData(it)
+                }
+            }
+            swipeRefresh.isRefreshing = false
+        }
+    }
+
+    private fun setStoryData(data: List<ListStory>) {
+        adapter.setStoryList(data)
+        binding.rvStory.layoutManager = LinearLayoutManager(this)
+        binding.rvStory.setHasFixedSize(true)
+        binding.rvStory.adapter = adapter
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -70,11 +88,11 @@ class HomeActivity : AppCompatActivity() {
         return true
     }
 
-    private fun alertDialogLogout(){
+    private fun alertDialogLogout() {
         AlertDialog.Builder(this)
             .setTitle("Log Out")
             .setMessage("Are you sure want to log out?")
-            .setPositiveButton("Yes", DialogInterface.OnClickListener{ _, _ ->
+            .setPositiveButton("Yes", DialogInterface.OnClickListener { _, _ ->
                 session.saveLogin(false)
                 session.deleteToken()
                 Intent(this, LoginActivity::class.java).also {
@@ -83,10 +101,14 @@ class HomeActivity : AppCompatActivity() {
                 finish()
             })
             .setNegativeButton("No", null)
-
             .show()
     }
-    private fun makeToast(msg: String) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+
+    private fun showLoading(value: Boolean){
+        if (value) {
+            binding.progressBar.visibility = View.VISIBLE
+        } else {
+            binding.progressBar.visibility = View.GONE
+        }
     }
 }
