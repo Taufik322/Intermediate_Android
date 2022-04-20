@@ -35,3 +35,11 @@ data class ListStory(
     @field:SerializedName("lon")
     val lon: Float
 )
+
+data class UploadStoryResponse(
+    @field:SerializedName("error")
+    val error: Boolean,
+
+    @field:SerializedName("messasge")
+    val message: String
+)
