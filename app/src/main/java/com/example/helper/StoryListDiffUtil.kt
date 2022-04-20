@@ -3,7 +3,7 @@ package com.example.helper
 import androidx.recyclerview.widget.DiffUtil
 import com.example.network.ListStory
 
-class DiffUtill(private val oldList: List<ListStory>, private val newList: List<ListStory>): DiffUtil.Callback() {
+class StoryListDiffUtil(private val oldList: List<ListStory>, private val newList: List<ListStory>): DiffUtil.Callback() {
     override fun getOldListSize(): Int {
         return oldList.size
     }

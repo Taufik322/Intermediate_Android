@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
-import com.example.helper.DiffUtill
+import com.example.helper.StoryListDiffUtil
 import com.example.network.ListStory
 import com.example.ui.StoryDetailActivity
 import com.example.ui.databinding.ItemStoriesBinding
@@ -64,7 +64,7 @@ class StoryAdapter : RecyclerView.Adapter<StoryAdapter.StoryViewHolder>() {
     }
 
     fun setStoryList(storyList: List<ListStory>) {
-        val diffCallback = DiffUtill(this.story, storyList)
+        val diffCallback = StoryListDiffUtil(this.story, storyList)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         story.clear()
         story.addAll(storyList)

@@ -5,6 +5,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -18,6 +19,7 @@ import com.example.helper.Session
 import com.example.network.ListStory
 import com.example.ui.databinding.ActivityHomeBinding
 import com.example.viewmodel.HomeViewModel
+import kotlinx.coroutines.Dispatchers
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
@@ -56,12 +58,15 @@ class HomeActivity : AppCompatActivity() {
 
         swipeRefresh.setOnRefreshListener {
             viewModel.getAllStories(session.getToken().toString())
-            viewModel.listStory.observe(this) {
-                if (it != null) {
-                    setStoryData(it)
+            Handler(Looper.getMainLooper()).postDelayed(Runnable {
+                viewModel.listStory.observe(this) {
+                    if (it != null) {
+                        setStoryData(it)
+                    }
                 }
-            }
-            swipeRefresh.isRefreshing = false
+                swipeRefresh.isRefreshing = false
+            }, 1000)
+
         }
     }
 
