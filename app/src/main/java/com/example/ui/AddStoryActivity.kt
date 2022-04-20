@@ -1,7 +1,6 @@
 package com.example.ui
 
 import android.Manifest
-import android.content.ContentValues
 import android.content.Intent
 import android.content.Intent.ACTION_GET_CONTENT
 import android.content.pm.PackageManager
@@ -9,7 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -19,21 +18,15 @@ import com.example.helper.Session
 import com.example.helper.rotateBitmap
 import com.example.helper.uriToFile
 import com.example.network.ApiConfig
-import com.example.network.Stories
 import com.example.network.UploadStoryResponse
 import com.example.ui.databinding.ActivityAddStoryBinding
-import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
 import retrofit2.Callback
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
-
+import java.io.*
 
 class AddStoryActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAddStoryBinding
@@ -56,7 +49,7 @@ class AddStoryActivity : AppCompatActivity() {
                     "Tidak mendapatkan permission.",
                     Toast.LENGTH_SHORT
                 ).show()
-//                finish()
+                finish()
             }
         }
     }
@@ -71,6 +64,7 @@ class AddStoryActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         session = Session(this)
+        binding.progressBar.visibility = View.INVISIBLE
 
         if (!allPermissionsGranted()) {
             ActivityCompat.requestPermissions(
@@ -112,7 +106,8 @@ class AddStoryActivity : AppCompatActivity() {
     }
 
     private fun uploadImage() {
-        if (getFile != null && !binding.etAdd.text.isEmpty()) {
+        if (getFile != null && binding.etAdd.text.isNotEmpty()) {
+
             val file = reduceFileImage(getFile as File)
 
             val description = binding.etAdd.text?.toString()?.toRequestBody("text/plain".toMediaType())
@@ -123,6 +118,8 @@ class AddStoryActivity : AppCompatActivity() {
                 requestImageFile
             )
 
+            binding.progressBar.visibility = View.VISIBLE
+
             val client = ApiConfig.getApiService().uploadStory("Bearer ${session.getToken()}", imageMultipart, description!!)
             client.enqueue(object : Callback<UploadStoryResponse> {
                 override fun onResponse(
@@ -130,6 +127,7 @@ class AddStoryActivity : AppCompatActivity() {
                     response: retrofit2.Response<UploadStoryResponse>
                 ) {
                     if (response.isSuccessful) {
+                        binding.progressBar.visibility = View.INVISIBLE
                         val responseBody = response.body()
                         if (responseBody != null && !responseBody.error) {
                             Toast.makeText(this@AddStoryActivity, "Success", Toast.LENGTH_SHORT).show()
@@ -139,11 +137,13 @@ class AddStoryActivity : AppCompatActivity() {
                             finish()
                         }
                     } else {
+                        binding.progressBar.visibility = View.INVISIBLE
                         Toast.makeText(this@AddStoryActivity, response.message(), Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 override fun onFailure(call: retrofit2.Call<UploadStoryResponse>, t: Throwable) {
+                    binding.progressBar.visibility = View.INVISIBLE
                     Toast.makeText(this@AddStoryActivity, "Gagal instance Retrofit", Toast.LENGTH_SHORT).show()
                 }
             })
@@ -176,12 +176,18 @@ class AddStoryActivity : AppCompatActivity() {
             val myFile = it.data?.getSerializableExtra("picture") as File
             val isBackCamera = it.data?.getBooleanExtra("isBackCamera", true) as Boolean
 
-            getFile = myFile
             val result = rotateBitmap(
                 BitmapFactory.decodeFile(myFile.path),
                 isBackCamera
             )
 
+            val bitmap: Bitmap = result
+
+            val os: OutputStream = BufferedOutputStream(FileOutputStream(myFile))
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os)
+            os.close()
+
+            getFile = myFile
             binding.previewImageView.setImageBitmap(result)
         }
     }

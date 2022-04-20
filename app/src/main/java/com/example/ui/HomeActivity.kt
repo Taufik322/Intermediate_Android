@@ -9,7 +9,6 @@ import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,7 +18,6 @@ import com.example.helper.Session
 import com.example.network.ListStory
 import com.example.ui.databinding.ActivityHomeBinding
 import com.example.viewmodel.HomeViewModel
-import kotlinx.coroutines.Dispatchers
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding

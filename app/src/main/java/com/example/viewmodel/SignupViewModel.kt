@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.network.ApiConfig
 import com.example.network.UserRegister
+import com.example.network.UserRegisterResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,8 +25,8 @@ class SignupViewModel : ViewModel() {
         _isLoading.value = true
 
         val client = ApiConfig.getApiService().registerUser(userRegister)
-        client.enqueue(object : Callback<UserRegister> {
-            override fun onResponse(call: Call<UserRegister>, response: Response<UserRegister>) {
+        client.enqueue(object : Callback<UserRegisterResponse> {
+            override fun onResponse(call: Call<UserRegisterResponse>, response: Response<UserRegisterResponse>) {
                 if (response.isSuccessful){
                     _isLoading.value = false
                     _isSuccessful.value = true
@@ -37,7 +38,7 @@ class SignupViewModel : ViewModel() {
                 }
             }
 
-            override fun onFailure(call: Call<UserRegister>, t: Throwable) {
+            override fun onFailure(call: Call<UserRegisterResponse>, t: Throwable) {
                 Log.e("TAG", "onFailure: ${t.message}")
             }
         })

@@ -6,11 +6,11 @@ import retrofit2.Call
 import retrofit2.http.*
 
 interface ApiService {
-    @FormUrlEncoded
+//    @FormUrlEncoded
     @POST("register")
     fun registerUser(
         @Body register: UserRegister
-    ): Call<UserRegister>
+    ): Call<UserRegisterResponse>
 
     @POST("login")
     fun loginUser(

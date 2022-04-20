@@ -64,10 +64,12 @@ class SignupActivity : AppCompatActivity() {
         }
 
         viewModel.isSuccessful.observe(this) {
-            if(it){
-                signupProcess(it)
-            } else {
-                makeToast("Must be valid email!")
+            viewModel.response.observe(this) { response ->
+                if(it){
+                    signupProcess(it)
+                } else {
+                    makeToast("Must be valid email!")
+                }
             }
         }
 
