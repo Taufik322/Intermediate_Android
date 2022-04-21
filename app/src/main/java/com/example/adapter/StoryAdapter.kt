@@ -58,6 +58,8 @@ class StoryAdapter : RecyclerView.Adapter<StoryAdapter.StoryViewHolder>() {
                         intent.putExtra(StoryDetailActivity.EXTRA_STORY_DESC, storyList.description)
                         itemView.context.startActivity(intent, optionsCompat.toBundle())
                     }
+
+
                 }
             }
         }
