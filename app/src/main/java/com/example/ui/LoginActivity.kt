@@ -11,8 +11,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.customview.ButtomCustomLogin
 import com.example.customview.EditTextCustomPassword
 import com.example.helper.Session
+import com.example.intermediateandroid.ui.R
+import com.example.intermediateandroid.ui.databinding.ActivityLoginBinding
 import com.example.network.UserLogin
-import com.example.ui.databinding.ActivityLoginBinding
 import com.example.viewmodel.LoginViewModel
 
 class LoginActivity : AppCompatActivity() {
@@ -103,28 +104,18 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun showLoading(value: Boolean) {
-        if (value) {
-            binding.progressBar.visibility = View.VISIBLE
-            binding.buttonLogin.isEnabled = false
-            binding.tvSignup.isEnabled = false
+        binding.apply {
+            progressBar.visibility = if(value) View.VISIBLE else View.GONE
+            buttonLogin.isEnabled = !value
+            tvSignup.isEnabled = !value
 
-            binding.logoLogin.alpha = 0.5f
-            binding.tvEmail.alpha = 0.5f
-            binding.editTextEmail.alpha = 0.5f
-            binding.tvPassword.alpha = 0.5f
-            binding.editTextPassword.alpha = 0.5f
-            binding.tvSignup.alpha = 0.5f
-        } else {
-            binding.progressBar.visibility = View.GONE
-            binding.buttonLogin.isEnabled = true
-            binding.tvSignup.isEnabled = true
-
-            binding.logoLogin.alpha = 1f
-            binding.tvEmail.alpha = 1f
-            binding.editTextEmail.alpha = 1f
-            binding.tvPassword.alpha = 1f
-            binding.editTextPassword.alpha = 1f
-            binding.tvSignup.alpha = 1f
+            val logoAlpha = if (value) 0.5f else 1f
+            logoLogin.alpha = logoAlpha
+            tvEmail.alpha = logoAlpha
+            editTextEmail.alpha = logoAlpha
+            tvPassword.alpha = logoAlpha
+            editTextPassword.alpha = logoAlpha
+            tvSignup.alpha = logoAlpha
         }
     }
 

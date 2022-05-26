@@ -21,5 +21,4 @@ class StoryListDiffUtil(private val oldList: List<ListStory>, private val newLis
         val new = newList[newItemPosition]
         return old.id == new.id
     }
-
 }

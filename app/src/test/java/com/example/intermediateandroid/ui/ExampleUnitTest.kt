@@ -1,4 +1,4 @@
-package com.example.ui
+package com.example.intermediateandroid.ui
 
 import org.junit.Test
 

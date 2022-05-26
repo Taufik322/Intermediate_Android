@@ -6,7 +6,6 @@ import retrofit2.Call
 import retrofit2.http.*
 
 interface ApiService {
-//    @FormUrlEncoded
     @POST("register")
     fun registerUser(
         @Body register: UserRegister
@@ -19,7 +18,15 @@ interface ApiService {
 
     @GET("stories")
     fun getAllStories(
-        @Header("Authorization") token: String
+        @Header("Authorization") token: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Call<Stories>
+
+    @GET("stories")
+    fun getAllStoriesWithLocation(
+        @Header("Authorization") token: String,
+        @Query("location") loc: Int
     ): Call<Stories>
 
     @Multipart
@@ -28,5 +35,15 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Part file: MultipartBody.Part,
         @Part("description") description: RequestBody
+    ): Call<UploadStoryResponse>
+
+    @Multipart
+    @POST("stories")
+    fun uploadStoryWithLocation(
+        @Header("Authorization") token: String,
+        @Part file: MultipartBody.Part,
+        @Part("description") description: RequestBody,
+        @Part("lat") lat: RequestBody,
+        @Part("lon") lon: RequestBody,
     ): Call<UploadStoryResponse>
 }

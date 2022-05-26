@@ -8,7 +8,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Environment
-import com.example.ui.R
+import com.example.intermediateandroid.ui.R
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*

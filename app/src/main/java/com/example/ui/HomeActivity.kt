@@ -1,32 +1,33 @@
 package com.example.ui
 
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.adapter.LoadingStateAdapter
 import com.example.adapter.StoryAdapter
 import com.example.helper.Session
-import com.example.network.ListStory
-import com.example.ui.databinding.ActivityHomeBinding
+import com.example.intermediateandroid.ui.R
+import com.example.intermediateandroid.ui.databinding.ActivityHomeBinding
 import com.example.viewmodel.HomeViewModel
+import com.example.viewmodel.ViewModelFactory
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var session: Session
-
-    private lateinit var adapter: StoryAdapter
-    private lateinit var viewModel: HomeViewModel
-
     private lateinit var swipeRefresh: SwipeRefreshLayout
+
+    private var adapter = StoryAdapter()
+
+    private val viewModel: HomeViewModel by viewModels {
+        ViewModelFactory(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,43 +37,26 @@ class HomeActivity : AppCompatActivity() {
         session = Session(this)
         binding.progressBar.visibility = View.GONE
         swipeRefresh = binding.refresh
-
-        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(
-            HomeViewModel::class.java
-        )
-
-        viewModel.isLoading.observe(this) {
-            showLoading(it)
-        }
-
-        adapter = StoryAdapter()
-
-        viewModel.getAllStories(session.getToken().toString())
-        viewModel.listStory.observe(this) {
-            if (it != null) {
-                setStoryData(it)
-            }
-        }
+        getData()
 
         swipeRefresh.setOnRefreshListener {
-            viewModel.getAllStories(session.getToken().toString())
-            Handler(Looper.getMainLooper()).postDelayed(Runnable {
-                viewModel.listStory.observe(this) {
-                    if (it != null) {
-                        setStoryData(it)
-                    }
-                }
-                swipeRefresh.isRefreshing = false
-            }, 1000)
-
+            swipeRefresh.isRefreshing = true
+            getData()
         }
     }
 
-    private fun setStoryData(data: List<ListStory>) {
-        adapter.setStoryList(data)
+    private fun getData() {
         binding.rvStory.layoutManager = LinearLayoutManager(this)
-        binding.rvStory.setHasFixedSize(true)
         binding.rvStory.adapter = adapter
+        binding.rvStory.adapter = adapter.withLoadStateFooter(
+            footer = LoadingStateAdapter {
+                adapter.retry()
+            }
+        )
+        viewModel.story.observe(this) { data ->
+            adapter.submitData(lifecycle, data)
+            swipeRefresh.isRefreshing = false
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -93,6 +77,12 @@ class HomeActivity : AppCompatActivity() {
                     startActivity(it)
                 }
             }
+
+            R.id.maps -> {
+                Intent(this, MapsActivity::class.java).also {
+                    startActivity(it)
+                }
+            }
         }
         return true
     }
@@ -101,23 +91,15 @@ class HomeActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("Log Out")
             .setMessage("Are you sure want to log out?")
-            .setPositiveButton("Yes", DialogInterface.OnClickListener { _, _ ->
+            .setPositiveButton("Yes") { _, _ ->
                 session.saveLogin(false)
                 session.deleteToken()
                 Intent(this, LoginActivity::class.java).also {
                     startActivity(it)
                 }
                 finish()
-            })
+            }
             .setNegativeButton("No", null)
             .show()
-    }
-
-    private fun showLoading(value: Boolean){
-        if (value) {
-            binding.progressBar.visibility = View.VISIBLE
-        } else {
-            binding.progressBar.visibility = View.GONE
-        }
     }
 }

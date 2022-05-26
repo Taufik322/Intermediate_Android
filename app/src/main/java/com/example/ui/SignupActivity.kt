@@ -10,8 +10,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.customview.ButtomCustomLogin
 import com.example.customview.EditTextCustomPassword
+import com.example.intermediateandroid.ui.R
+import com.example.intermediateandroid.ui.databinding.ActivitySignupBinding
 import com.example.network.UserRegister
-import com.example.ui.databinding.ActivitySignupBinding
 import com.example.viewmodel.SignupViewModel
 
 class SignupActivity : AppCompatActivity() {
@@ -96,30 +97,19 @@ class SignupActivity : AppCompatActivity() {
     }
 
     private fun showLoading(value: Boolean){
-        if (value){
-            binding.progressBar.visibility = View.VISIBLE
-            binding.buttonSignup.isEnabled = false
-            binding.tvLogin.isEnabled = false
+        binding.apply {
+            progressBar.visibility = if(value) View.VISIBLE else View.GONE
+            buttonSignup.isEnabled = !value
+            tvLogin.isEnabled = !value
 
-            binding.logoLogin.alpha = 0.5f
-            binding.tvNameSignup.alpha = 0.5f
-            binding.editTextNameSignup.alpha = 0.5f
-            binding.tvEmailSignup.alpha = 0.5f
-            binding.editTextEmailSignup.alpha = 0.5f
-            binding.tvPasswordSignup.alpha = 0.5f
-            binding.editTextPasswordSignup.alpha = 0.5f
-        } else {
-            binding.progressBar.visibility = View.GONE
-            binding.buttonSignup.isEnabled = true
-            binding.tvLogin.isEnabled = true
-
-            binding.logoLogin.alpha = 1f
-            binding.tvNameSignup.alpha = 1f
-            binding.editTextNameSignup.alpha = 1f
-            binding.tvEmailSignup.alpha = 1f
-            binding.editTextEmailSignup.alpha = 1f
-            binding.tvPasswordSignup.alpha = 1f
-            binding.editTextPasswordSignup.alpha = 1f
+            val logoAlpha = if (value) 0.5f else 1f
+            logoLogin.alpha = logoAlpha
+            tvNameSignup.alpha = logoAlpha
+            editTextNameSignup.alpha = logoAlpha
+            tvEmailSignup.alpha = logoAlpha
+            editTextEmailSignup.alpha = logoAlpha
+            tvPasswordSignup.alpha = logoAlpha
+            editTextPasswordSignup.alpha = logoAlpha
         }
     }
 

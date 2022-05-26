@@ -3,17 +3,15 @@ package com.example.ui
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
-import com.example.ui.databinding.ActivityStoryDetailBinding
+import com.example.intermediateandroid.ui.databinding.ActivityStoryDetailBinding
 
 class StoryDetailActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityStoryDetailBinding
 
     companion object {
         const val EXTRA_STORY_NAME = "extra_story_detail"
         const val EXTRA_STORY_IMAGE = "extra_story_image"
         const val EXTRA_STORY_DESC = "extra_story_desc"
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
