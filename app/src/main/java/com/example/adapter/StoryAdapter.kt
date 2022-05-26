@@ -5,31 +5,27 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.app.ActivityOptionsCompat
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
-import com.example.helper.StoryListDiffUtil
+import com.example.intermediateandroid.ui.databinding.ItemStoriesBinding
 import com.example.network.ListStory
 import com.example.ui.StoryDetailActivity
-import com.example.ui.databinding.ItemStoriesBinding
 
-class StoryAdapter : RecyclerView.Adapter<StoryAdapter.StoryViewHolder>() {
-    private val story = ArrayList<ListStory>()
+class StoryAdapter : PagingDataAdapter<ListStory, StoryAdapter.StoryViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoryViewHolder {
-        val storyItem =
-            ItemStoriesBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return StoryViewHolder(storyItem)
+        val binding = ItemStoriesBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return StoryViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: StoryViewHolder, position: Int) {
-        val story = story[position]
-        holder.bind(story)
-    }
-
-    override fun getItemCount(): Int {
-        return story.size
+        val data = getItem(position)
+        if (data != null) {
+            holder.bind(data)
+        }
     }
 
     class StoryViewHolder(private val binding: ItemStoriesBinding) :
@@ -58,18 +54,20 @@ class StoryAdapter : RecyclerView.Adapter<StoryAdapter.StoryViewHolder>() {
                         intent.putExtra(StoryDetailActivity.EXTRA_STORY_DESC, storyList.description)
                         itemView.context.startActivity(intent, optionsCompat.toBundle())
                     }
-
-
                 }
             }
         }
     }
 
-    fun setStoryList(storyList: List<ListStory>) {
-        val diffCallback = StoryListDiffUtil(this.story, storyList)
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
-        story.clear()
-        story.addAll(storyList)
-        diffResult.dispatchUpdatesTo(this)
+    companion object {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ListStory>() {
+            override fun areItemsTheSame(oldItem: ListStory, newItem: ListStory): Boolean {
+                return oldItem == newItem
+            }
+
+            override fun areContentsTheSame(oldItem: ListStory, newItem: ListStory): Boolean {
+                return oldItem.id == newItem.id
+            }
+        }
     }
 }

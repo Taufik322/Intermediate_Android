@@ -8,7 +8,7 @@ import android.text.TextWatcher
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
-import com.example.ui.R
+import com.example.intermediateandroid.ui.R
 
 class EditTextCustom : AppCompatEditText {
     private lateinit var backgroundEditText: Drawable

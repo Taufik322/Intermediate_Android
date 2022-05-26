@@ -6,7 +6,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
-import com.example.ui.R
+import com.example.intermediateandroid.ui.R
 
 class ButtomCustomLogin : AppCompatButton {
     private lateinit var enabledLoginButton: Drawable
